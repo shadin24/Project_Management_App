@@ -1,9 +1,27 @@
-import React from 'react'
-import { createPortal } from 'react-dom'
-export default function Modal({children}) {
-  return (
-   createPortal( <dialog>
-    {children}
-</dialog>,getelementById('modal-root')
-  )
-}
+import React, { useRef, forwardRef, useImperativeHandle } from "react";
+import { createPortal } from "react-dom";
+import Button from "./Button";
+
+const Modal = forwardRef(function Modal({ children, buttonCaption }, ref) {
+  const dialog = useRef(null);
+
+  useImperativeHandle(ref, () => ({
+    open() {
+      if (dialog.current) {
+        dialog.current.showModal();
+      }
+    }
+  }));
+
+  return createPortal(
+    <dialog ref={dialog} className="backdrop:bg-stone-900/90 p-4 rounded-md shadow-md">
+      {children}
+      <form method="dialog" className="mt-4 text-right">
+        <Button >{buttonCaption}</Button>
+      </form>
+    </dialog>,
+    document.getElementById("modal-root")
+  );
+});
+
+export default Modal;
